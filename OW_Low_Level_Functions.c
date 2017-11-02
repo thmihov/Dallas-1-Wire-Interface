@@ -10,7 +10,8 @@
 #include <util/delay.h>
 
 /**************************************************/
-	     /* Pulls DQ line low */
+/*Pulls DQ line low */
+/**************************************************/
 
 void OW_LOW()
 {
@@ -20,7 +21,8 @@ void OW_LOW()
 }
 
 /**************************************************/
-       /* Sets DQ line at idle state (high)*/
+/*      Sets DQ line at idle state (high)*/
+/**************************************************/
 
 void OW_IDLE()
 {
@@ -30,8 +32,9 @@ void OW_IDLE()
 
 /**************************************************/
 /* Write 1 time slot */
-/* Pull DQ low,wait 1us (1-15us) and release.*/
+/* Pull DQ low,wait 1us (1-15us) and release. */
 /* Wait another 60us because the time slot cannot be less than 60us -> Tlow+Tidle >= 60us */
+/**************************************************/
 	
 void OW_WR1()
 {
@@ -46,6 +49,7 @@ void OW_WR1()
 /* Write 0 time slot */
 /* Pull DQ low,wait min 60us (one time slot) and release */
 /* Wait another 2us because the time slot cannot be less than 60us ->Tlow+Tidle >= 60us */
+/**************************************************/
 
 void OW_WR0()
 {
@@ -59,6 +63,7 @@ void OW_WR0()
 /* Read single bit from slave*/
 /* Pull DQ low,wait min. 1us than relese.Wait 15uS and read the result.*/
 /* Wait about 40us (min. time slot is 60uS) to complete the time slot */
+/**************************************************/
 
 unsigned char OW_READB()
 {
@@ -84,21 +89,22 @@ unsigned char OW_READB()
 
 /**************************************************/
 /*Read single byte from slave*/
-/*Calls 8 times 1W_READB(),stores the results in array */
-/*and converts them into single byte */
+/*Calls 8 times OW_READB(),stores the results in array */
+/*and converts it into single byte */
+/**************************************************/
 
 unsigned char OW_READBYTE()
 {
-	 unsigned char i=0;
-	 unsigned char tarr[8];
-	 unsigned char data=0;
-	 while (i<8)
+	 unsigned char i=0;	//counter var
+	 unsigned char tarr[8];	//array for storing bits
+	 unsigned char data=0;	//final hex value after shifting array elements
+	 while (i<8)	//8 times read 1bit and store it in the array
 	 {
-	 	tarr[i]=OW_READB();
+	 	tarr[i]=OW_READB();	//read 1 bit
 		i++;
 	 }
 	 i=0;
-	 while(i<8)
+	 while(i<8)	//convert the array to single byte
 	 {
 	 	if (tarr[i])
 		{
@@ -112,19 +118,20 @@ unsigned char OW_READBYTE()
 /**************************************************/
 /* Write single byte to the slave*/
 /* Check every bit of the number and calls the corresponding function-Write 1 ot Write 0 */
+/**************************************************/
 
 void OW_WRITE(unsigned char data)
 {
-	unsigned char i=0;	//Counter
+	unsigned char i=0;	//Counter var
 	unsigned char res;	//Result var
-	while (i<8)
+	while (i<8)	//do 8 times
 	{
 	res=(data&(1<<0));
-	if (res==1)
+	if (res==1)	//if current bit is 1,call "write 1" function
 	OW_WR1();
-	if (res==0)
+	if (res==0)	//if current bit is 0,call "write 0" function
 	OW_WR0();
-	data=data>>1;
+	data=data>>1;	//shift for the next bit
 	i++;
 	}
 }
@@ -134,6 +141,7 @@ void OW_WRITE(unsigned char data)
 /* Pull DQ low for min.480uS,than release it.Wait 60us (15-60uS) and then read the DQ line. */
 /* If the line is low,than there is at least one device (return 1) */
 /* if the line is high there is no device or there is malfunction - short circuit or so (return 0)*/
+/**************************************************/
 
 unsigned char OW_RESET()
 {
